@@ -16,6 +16,18 @@ The primary objective of this project is to develop an integrated and efficient 
 
 ---
 
+## WEB DASHBOARD INTERFACE (UI)
+
+A complementary responsive browser-based dashboard is provided in [`ui/index.html`](ui/index.html):
+- **Live Priority Queue View**: Visual rendering of Min-Heap prioritized patients.
+- **Active Examination Bay**: Real-time examination status card.
+- **Interactive Emergency Bed Matrix**: 22 emergency beds with instant occupancy toggles.
+- **Instant Simulation Controls**: Buttons to advance highest-priority cases and dynamically intake emergency arrivals.
+
+Simply open [`ui/index.html`](ui/index.html) in any modern browser to view the interface.
+
+---
+
 ## SYSTEM ARCHITECTURE
 
 ```mermaid
