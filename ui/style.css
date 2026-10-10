@@ -251,3 +251,95 @@ td {
     color: var(--accent);
     border: 1px solid var(--accent);
 }
+
+/* Bed Matrix Styles */
+.bed-panel {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 20px;
+    margin-top: 24px;
+}
+
+.bed-legend {
+    display: flex;
+    gap: 16px;
+    font-size: 13px;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.dot.vacant { background-color: var(--less-urgent); }
+.dot.occupied { background-color: var(--critical); }
+
+.beds-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: 12px;
+    margin-top: 14px;
+}
+
+.bed-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 12px;
+    text-align: center;
+    transition: transform 0.15s, border-color 0.15s;
+}
+
+.bed-card:hover {
+    transform: translateY(-2px);
+}
+
+.bed-card.occupied {
+    border-color: rgba(239, 68, 68, 0.6);
+    background: rgba(239, 68, 68, 0.08);
+}
+
+.bed-card.vacant {
+    border-color: rgba(34, 197, 94, 0.4);
+}
+
+.bed-id {
+    font-size: 14px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 4px;
+}
+
+.bed-type {
+    font-size: 10px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+}
+
+.bed-status-tag {
+    font-size: 10px;
+    font-weight: 700;
+    padding: 3px 6px;
+    border-radius: 4px;
+    text-transform: uppercase;
+}
+
+.bed-status-tag.vacant {
+    color: var(--less-urgent);
+    background: rgba(34, 197, 94, 0.15);
+}
+
+.bed-status-tag.occupied {
+    color: var(--critical);
+    background: rgba(239, 68, 68, 0.15);
+}
