@@ -7,99 +7,191 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <header class="header">
-        <div class="logo-area">
-            <h1>Emergency Department Live Dashboard</h1>
-            <p>Priority Queue & Bed Allocation Monitor</p>
-        </div>
-        <div class="header-status">
-            <span class="status-indicator live"></span>
-            <span>24x7 ER Active</span>
+
+    <!-- Header Section -->
+    <header class="main-header">
+        <h1>Hospital Emergency Management System</h1>
+        <p>Console C Project Web Interface &bull; Priority Queue (DSA) & Emergency Bed Tracker</p>
+        <div class="system-status">
+            <span>Status: <strong class="text-green">ONLINE (24x7 Emergency Services)</strong></span>
+            &bull; <span id="clock-display">Time: --:--:--</span>
         </div>
     </header>
 
-    <main class="container">
-        <section class="overview-section">
-            <div class="stat-box">
-                <h3>Total Waiting</h3>
-                <p id="total-waiting">0</p>
-            </div>
-            <div class="stat-box">
-                <h3>Under Treatment</h3>
-                <p id="under-treatment">0</p>
-            </div>
-            <div class="stat-box">
-                <h3>Beds Occupied</h3>
-                <p id="beds-occupied">0 / 22</p>
-            </div>
-            <div class="stat-box">
-                <h3>Critical Cases</h3>
-                <p id="critical-cases">0</p>
-            </div>
-        </section>
+    <div class="main-container">
 
-        <!-- Current Active Patient Examination Card -->
-        <section class="active-patient-banner">
-            <div class="card-header">
-                <h2>Active Examination Bay</h2>
-                <span class="badge badge-pulse">LIVE EXAM</span>
+        <!-- Top Overview Stats -->
+        <div class="stats-row">
+            <div class="stat-card">
+                <span class="stat-title">Patients Waiting</span>
+                <span class="stat-value" id="stat-waiting">0</span>
             </div>
-            <div class="patient-card-body" id="current-exam-bay">
-                <div class="exam-empty">
-                    <p>No patient currently in examination bay. Click "Advance Highest Priority" to dequeue.</p>
-                </div>
+            <div class="stat-card">
+                <span class="stat-title">Under Treatment</span>
+                <span class="stat-value" id="stat-treating">0</span>
             </div>
-        </section>
+            <div class="stat-card">
+                <span class="stat-title">Total Registered</span>
+                <span class="stat-value" id="stat-total">0</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-title">Beds Occupied</span>
+                <span class="stat-value" id="stat-beds">0 / 22</span>
+            </div>
+        </div>
 
-        <section class="content-grid">
-            <div class="queue-panel">
-                <div class="panel-header">
-                    <h2>Priority Waiting Queue (Min-Heap Order)</h2>
-                    <div class="actions">
-                        <button id="btn-advance" class="btn btn-primary">Advance Highest Priority</button>
-                        <button id="btn-add-demo" class="btn btn-secondary">+ Intake New Patient</button>
+        <!-- Section 1: Receptionist Patient Intake Form -->
+        <section class="card">
+            <h2>1. Receptionist Portal &mdash; Emergency Patient Registration</h2>
+            <p class="section-desc">Register new arrivals. Patients are automatically inserted into the Min-Heap Priority Queue based on medical severity (Level 1 = Highest Priority).</p>
+
+            <form id="patient-form">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="p-name">Patient Full Name *</label>
+                        <input type="text" id="p-name" placeholder="e.g. Rahul Sharma" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="p-age">Age *</label>
+                        <input type="number" id="p-age" min="0" max="125" placeholder="e.g. 45" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="p-gender">Gender</label>
+                        <select id="p-gender">
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="p-contact">Contact Number</label>
+                        <input type="text" id="p-contact" placeholder="e.g. 9876543210">
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label for="p-complaint">Chief Medical Complaint *</label>
+                        <input type="text" id="p-complaint" placeholder="e.g. Severe crushing chest pain radiating to left arm" required>
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label for="p-severity">Triage Severity Level (Emergency Severity Index) *</label>
+                        <select id="p-severity" required>
+                            <option value="1">Level 1 - CRITICAL / RESUSCITATION (Immediate Life Threat)</option>
+                            <option value="2">Level 2 - EMERGENT (High Risk / Minutes Matter)</option>
+                            <option value="3" selected>Level 3 - URGENT (Stable vitals, multiple resources needed)</option>
+                            <option value="4">Level 4 - LESS URGENT (Simple lacerations, sprains)</option>
+                            <option value="5">Level 5 - NON-URGENT (Routine examination, minor rash)</option>
+                        </select>
                     </div>
                 </div>
-                <div class="table-container">
-                    <table id="queue-table">
-                        <thead>
-                            <tr>
-                                <th>Priority</th>
-                                <th>Token</th>
-                                <th>Patient Name</th>
-                                <th>Age</th>
-                                <th>Acuity Level</th>
-                                <th>Complaint</th>
-                                <th>Arrival Seq</th>
-                            </tr>
-                        </thead>
-                        <tbody id="queue-body">
-                            <!-- Populated via JS -->
-                        </tbody>
-                    </table>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-green">Register & Enqueue Patient</button>
+                    <button type="button" id="btn-demo-data" class="btn btn-blue">Load Demo Simulation (6 Patients)</button>
+                    <button type="reset" class="btn btn-gray">Clear Form</button>
+                </div>
+            </form>
+        </section>
+
+        <!-- Section 2: Priority Waiting Queue Table -->
+        <section class="card">
+            <div class="card-header-flex">
+                <div>
+                    <h2>2. Live Emergency Priority Queue (Min-Heap)</h2>
+                    <p class="section-desc">Patients waiting to be seen by the doctor. Sorted strictly by Severity (Level 1 first) with FIFO tie-breaking.</p>
+                </div>
+                <div>
+                    <button type="button" id="btn-advance-queue" class="btn btn-orange btn-lg">
+                        Advance Highest-Priority Patient (Dequeue)
+                    </button>
                 </div>
             </div>
 
-            <!-- Emergency Bed Occupancy Grid -->
-            <div class="bed-panel">
-                <div class="panel-header">
-                    <h2>Emergency Bed Matrix (22 Beds Capacity)</h2>
-                    <div class="bed-legend">
-                        <span class="legend-item"><i class="dot vacant"></i> Vacant</span>
-                        <span class="legend-item"><i class="dot occupied"></i> Occupied</span>
-                    </div>
-                </div>
-                <div class="beds-grid" id="beds-container">
-                    <!-- Populated dynamically via JS -->
+            <div class="table-wrap">
+                <table class="data-table" id="queue-table">
+                    <thead>
+                        <tr>
+                            <th>Queue Rank</th>
+                            <th>Token</th>
+                            <th>Patient Name</th>
+                            <th>Age / Gender</th>
+                            <th>Severity Level</th>
+                            <th>Chief Complaint</th>
+                            <th>Arrival Order</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="queue-tbody">
+                        <tr>
+                            <td colspan="8" class="text-center text-muted">No patients waiting in queue. Register a patient above or load demo simulation.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Section 3: Doctor Examination Bay & Treatment -->
+        <section class="card">
+            <h2>3. Doctor & Clinical Treatment Bay</h2>
+            <p class="section-desc">Active patient currently being examined. Doctor can record clinical diagnosis notes, allocate emergency beds, or discharge.</p>
+
+            <div id="exam-bay-container">
+                <div class="alert alert-info">
+                    Examination Bay is currently empty. Click <strong>"Advance Highest-Priority Patient"</strong> above to dequeue next critical patient.
                 </div>
             </div>
         </section>
-    </main>
 
-    <footer class="footer">
-        <p>Hospital Emergency Management System &bull; <span id="clock-display">Live Clock</span></p>
+        <!-- Section 4: Emergency Beds Matrix -->
+        <section class="card">
+            <div class="card-header-flex">
+                <div>
+                    <h2>4. Emergency Bed Availability Matrix (22 Beds)</h2>
+                    <p class="section-desc">Click any bed card to manually toggle its Vacant / Occupied state.</p>
+                </div>
+                <div class="bed-legends">
+                    <span class="legend-box vacant-box"></span> Vacant
+                    <span class="legend-box occupied-box"></span> Occupied
+                </div>
+            </div>
+
+            <div class="beds-container" id="beds-matrix">
+                <!-- Injected via JavaScript -->
+            </div>
+        </section>
+
+        <!-- Section 5: Persistent Audit Logs & Reports -->
+        <section class="card">
+            <div class="card-header-flex">
+                <div>
+                    <h2>5. Persistent System Audit Logs & Daily Reports</h2>
+                    <p class="section-desc">Mirror of <code>er_patient_log.txt</code> and <code>daily_er_report.txt</code> generated by the C program.</p>
+                </div>
+                <div class="log-actions">
+                    <button type="button" id="btn-download-log" class="btn btn-sm btn-outline">Download er_patient_log.txt</button>
+                    <button type="button" id="btn-download-report" class="btn btn-sm btn-outline">Download daily_er_report.txt</button>
+                    <button type="button" id="btn-clear-all" class="btn btn-sm btn-red">Reset All Records</button>
+                </div>
+            </div>
+
+            <div class="log-box-wrap">
+                <label for="log-preview"><strong>Live Activity Log (er_patient_log.txt):</strong></label>
+                <textarea id="log-preview" rows="8" readonly></textarea>
+            </div>
+        </section>
+
+    </div>
+
+    <!-- Footer -->
+    <footer class="main-footer">
+        <p><strong>Hospital Emergency Management System</strong> &bull; Developed in C with Data Structures & Algorithms</p>
+        <p><small>Created by <a href="https://github.com/sahilroykgp-art" target="_blank">Sahil Roy</a> &bull; Department of Computer Applications</small></p>
     </footer>
 
+    <!-- App Logic -->
     <script src="app.js"></script>
 </body>
 </html>
