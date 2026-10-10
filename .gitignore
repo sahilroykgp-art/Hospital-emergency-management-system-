@@ -1,0 +1,19 @@
+# Binaries and object files
+*.exe
+*.o
+*.obj
+bin/
+build/
+hospital_er
+hospital_er.exe
+test_runner
+test_runner.exe
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
