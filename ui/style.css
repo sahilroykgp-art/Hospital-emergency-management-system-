@@ -177,22 +177,31 @@ body {
 }
 
 .btn {
-    padding: 9px 16px;
+    padding: 10px 18px;
     border-radius: 8px;
     font-size: 13px;
     font-weight: 600;
     cursor: pointer;
     border: none;
-    transition: all 0.2s;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.btn:active {
+    transform: scale(0.97);
 }
 
 .btn-primary {
     background: var(--accent);
     color: #ffffff;
+    box-shadow: 0 2px 6px rgba(59, 130, 246, 0.3);
 }
 
 .btn-primary:hover {
     background: #2563eb;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.45);
 }
 
 .btn-secondary {
@@ -203,6 +212,7 @@ body {
 
 .btn-secondary:hover {
     background: #475569;
+    border-color: #64748b;
 }
 
 .table-container {
