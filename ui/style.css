@@ -240,6 +240,29 @@ td {
     border-bottom: 1px solid var(--border-color);
 }
 
+tbody tr {
+    transition: background-color 0.15s ease;
+}
+
+tbody tr:nth-child(even) {
+    background-color: rgba(255, 255, 255, 0.02);
+}
+
+tbody tr:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+code {
+    background: rgba(0, 0, 0, 0.35);
+    border: 1px solid var(--border-color);
+    padding: 3px 7px;
+    border-radius: 5px;
+    font-size: 13px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    color: #38bdf8;
+    font-weight: 600;
+}
+
 /* Badges */
 .badge {
     display: inline-block;
