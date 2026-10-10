@@ -38,23 +38,43 @@
             </div>
         </section>
 
+        <!-- Current Active Patient Examination Card -->
+        <section class="active-patient-banner">
+            <div class="card-header">
+                <h2>Active Examination Bay</h2>
+                <span class="badge badge-pulse">LIVE EXAM</span>
+            </div>
+            <div class="patient-card-body" id="current-exam-bay">
+                <div class="exam-empty">
+                    <p>No patient currently in examination bay. Click "Advance Highest Priority" to dequeue.</p>
+                </div>
+            </div>
+        </section>
+
         <section class="content-grid">
             <div class="queue-panel">
-                <h2>Priority Waiting Queue</h2>
+                <div class="panel-header">
+                    <h2>Priority Waiting Queue (Min-Heap Order)</h2>
+                    <div class="actions">
+                        <button id="btn-advance" class="btn btn-primary">Advance Highest Priority</button>
+                        <button id="btn-add-demo" class="btn btn-secondary">+ Intake New Patient</button>
+                    </div>
+                </div>
                 <div class="table-container">
                     <table id="queue-table">
                         <thead>
                             <tr>
+                                <th>Priority</th>
                                 <th>Token</th>
                                 <th>Patient Name</th>
                                 <th>Age</th>
                                 <th>Acuity Level</th>
                                 <th>Complaint</th>
-                                <th>Arrival</th>
+                                <th>Arrival Seq</th>
                             </tr>
                         </thead>
                         <tbody id="queue-body">
-                            <!-- Injected dynamically -->
+                            <!-- Populated via JS -->
                         </tbody>
                     </table>
                 </div>
