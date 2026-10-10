@@ -184,3 +184,14 @@ document.getElementById("btn-add-demo").addEventListener("click", () => {
 renderQueue();
 renderBeds();
 renderActivePatient();
+
+// Live clock update
+function updateClock() {
+    const clockEl = document.getElementById("clock-display");
+    if (clockEl) {
+        const now = new Date();
+        clockEl.textContent = `Live Status: ${now.toLocaleTimeString()}`;
+    }
+}
+setInterval(updateClock, 1000);
+updateClock();

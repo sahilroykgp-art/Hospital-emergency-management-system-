@@ -422,3 +422,12 @@ code {
         grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
     }
 }
+
+.footer {
+    text-align: center;
+    padding: 24px 0;
+    color: var(--text-muted);
+    font-size: 13px;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    margin-top: 32px;
+}
