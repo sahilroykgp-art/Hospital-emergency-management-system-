@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hospital Emergency Management System</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header class="header">
+        <div class="logo-area">
+            <h1>Emergency Department Live Dashboard</h1>
+            <p>Priority Queue & Bed Allocation Monitor</p>
+        </div>
+        <div class="header-status">
+            <span class="status-indicator live"></span>
+            <span>24x7 ER Active</span>
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="overview-section">
+            <div class="stat-box">
+                <h3>Total Waiting</h3>
+                <p id="total-waiting">0</p>
+            </div>
+            <div class="stat-box">
+                <h3>Under Treatment</h3>
+                <p id="under-treatment">0</p>
+            </div>
+            <div class="stat-box">
+                <h3>Beds Occupied</h3>
+                <p id="beds-occupied">0 / 22</p>
+            </div>
+            <div class="stat-box">
+                <h3>Critical Cases</h3>
+                <p id="critical-cases">0</p>
+            </div>
+        </section>
+
+        <section class="content-grid">
+            <div class="queue-panel">
+                <h2>Priority Waiting Queue</h2>
+                <div class="table-container">
+                    <table id="queue-table">
+                        <thead>
+                            <tr>
+                                <th>Token</th>
+                                <th>Patient Name</th>
+                                <th>Age</th>
+                                <th>Acuity Level</th>
+                                <th>Complaint</th>
+                                <th>Arrival</th>
+                            </tr>
+                        </thead>
+                        <tbody id="queue-body">
+                            <!-- Injected dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="app.js"></script>
+</body>
+</html>
