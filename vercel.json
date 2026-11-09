@@ -1,4 +1,8 @@
 {
-  "outputDirectory": "ui",
-  "cleanUrls": true
+  "cleanUrls": true,
+  "rewrites": [
+    { "source": "/ui", "destination": "/index.html" },
+    { "source": "/ui/", "destination": "/index.html" },
+    { "source": "/ui/:path*", "destination": "/:path*" }
+  ]
 }

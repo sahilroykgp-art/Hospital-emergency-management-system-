@@ -1,6 +1,6 @@
 // ============================================================================
-// Hospital Emergency Management System - Localhost Web Server
-// Serves the Web Dashboard (ui/) with zero external dependencies.
+// Hospital Emergency Management System - Web Server & Serverless Handler
+// Serves the Web Dashboard with zero external dependencies.
 // ============================================================================
 
 const http = require('http');
@@ -8,8 +8,8 @@ const fs = require('fs');
 const path = require('path');
 
 const PORT = process.env.PORT || 3000;
-const UI_DIR = path.join(__dirname, 'ui');
 const ROOT_DIR = __dirname;
+const UI_DIR = path.join(__dirname, 'ui');
 
 const MIME_TYPES = {
     '.html': 'text/html; charset=utf-8',
@@ -23,34 +23,46 @@ const MIME_TYPES = {
     '.svg': 'image/svg+xml'
 };
 
-const server = http.createServer((req, res) => {
-    // Normalize URL and remove query strings
-    let reqUrl = req.url.split('?')[0];
-    if (reqUrl === '/') reqUrl = '/index.html';
+const requestHandler = (req, res) => {
+    let reqUrl = (req.url || '/').split('?')[0];
+    if (reqUrl === '/' || reqUrl === '') reqUrl = '/index.html';
 
-    // Allow serving root-level text files (e.g. er_patient_log.txt, daily_er_report.txt)
-    let filePath;
-    if (reqUrl === '/er_patient_log.txt' || reqUrl === '/daily_er_report.txt') {
-        filePath = path.join(ROOT_DIR, reqUrl);
-    } else {
-        filePath = path.join(UI_DIR, reqUrl);
+    // Remove leading /ui/ if requested
+    let cleanUrl = reqUrl.replace(/^\/ui(\/|$)/, '/');
+    if (cleanUrl === '/' || cleanUrl === '') cleanUrl = '/index.html';
+
+    // Check root directory first, then ui directory
+    let filePath = path.join(ROOT_DIR, cleanUrl);
+    if (!fs.existsSync(filePath) || fs.statSync(filePath).isDirectory()) {
+        filePath = path.join(UI_DIR, cleanUrl);
     }
 
     // Security check: prevent directory traversal
-    if (!filePath.startsWith(UI_DIR) && !filePath.startsWith(ROOT_DIR)) {
+    const resolvedPath = path.resolve(filePath);
+    if (!resolvedPath.startsWith(ROOT_DIR)) {
         res.writeHead(403, { 'Content-Type': 'text/plain' });
         res.end('403 Forbidden');
         return;
     }
 
-    fs.stat(filePath, (err, stats) => {
+    fs.stat(resolvedPath, (err, stats) => {
         if (err || !stats.isFile()) {
+            // Fallback to index.html
+            const fallbackPath = path.join(ROOT_DIR, 'index.html');
+            if (fs.existsSync(fallbackPath)) {
+                res.writeHead(200, {
+                    'Content-Type': 'text/html; charset=utf-8',
+                    'Access-Control-Allow-Origin': '*'
+                });
+                fs.createReadStream(fallbackPath).pipe(res);
+                return;
+            }
             res.writeHead(404, { 'Content-Type': 'text/plain' });
             res.end('404 Not Found');
             return;
         }
 
-        const ext = path.extname(filePath).toLowerCase();
+        const ext = path.extname(resolvedPath).toLowerCase();
         const contentType = MIME_TYPES[ext] || 'application/octet-stream';
 
         res.writeHead(200, {
@@ -58,19 +70,24 @@ const server = http.createServer((req, res) => {
             'Access-Control-Allow-Origin': '*'
         });
 
-        const stream = fs.createReadStream(filePath);
+        const stream = fs.createReadStream(resolvedPath);
         stream.pipe(res);
     });
-});
+};
 
-server.listen(PORT, '127.0.0.1', () => {
-    console.log('======================================================================');
-    console.log('    HOSPITAL EMERGENCY MANAGEMENT SYSTEM - LOCAL WEB SERVER           ');
-    console.log('======================================================================');
-    console.log(`  Local URL : http://localhost:${PORT}`);
-    console.log(`  IP URL    : http://127.0.0.1:${PORT}`);
-    console.log(`  Serving   : ${UI_DIR}`);
-    console.log('======================================================================');
-    console.log('Press Ctrl+C to stop the server.');
-});
+// Start local HTTP server if executed directly
+if (require.main === module) {
+    const server = http.createServer(requestHandler);
+    server.listen(PORT, '127.0.0.1', () => {
+        console.log('======================================================================');
+        console.log('    HOSPITAL EMERGENCY MANAGEMENT SYSTEM - LOCAL WEB SERVER           ');
+        console.log('======================================================================');
+        console.log(`  Local URL : http://localhost:${PORT}`);
+        console.log(`  IP URL    : http://127.0.0.1:${PORT}`);
+        console.log('======================================================================');
+        console.log('Press Ctrl+C to stop the server.');
+    });
+}
 
+// Export for serverless environments (e.g. Vercel)
+module.exports = requestHandler;

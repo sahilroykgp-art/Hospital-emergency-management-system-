@@ -2,7 +2,6 @@
   "name": "hospital-emergency-management-system",
   "version": "1.0.0",
   "description": "Hospital Emergency Management System - DSA Priority Queue & Clinical ER Dashboard",
-  "main": "server.js",
   "scripts": {
     "start": "node server.js",
     "test": "node tests/test_ui.js"
@@ -18,4 +17,3 @@
   "author": "Sahil Roy",
   "license": "MIT"
 }
-
