@@ -9,6 +9,7 @@ const path = require('path');
 
 const PORT = process.env.PORT || 3000;
 const ROOT_DIR = path.resolve(__dirname, '..');
+const PUBLIC_DIR = path.join(ROOT_DIR, 'public');
 const UI_DIR = path.join(ROOT_DIR, 'ui');
 
 const MIME_TYPES = {
@@ -31,8 +32,11 @@ const requestHandler = (req, res) => {
     let cleanUrl = reqUrl.replace(/^\/ui(\/|$)/, '/');
     if (cleanUrl === '/' || cleanUrl === '') cleanUrl = '/index.html';
 
-    // Check root directory first, then ui directory
-    let filePath = path.join(ROOT_DIR, cleanUrl);
+    // Check public/ directory first, then root, then ui/
+    let filePath = path.join(PUBLIC_DIR, cleanUrl);
+    if (!fs.existsSync(filePath) || fs.statSync(filePath).isDirectory()) {
+        filePath = path.join(ROOT_DIR, cleanUrl);
+    }
     if (!fs.existsSync(filePath) || fs.statSync(filePath).isDirectory()) {
         filePath = path.join(UI_DIR, cleanUrl);
     }
@@ -47,7 +51,7 @@ const requestHandler = (req, res) => {
 
     fs.stat(resolvedPath, (err, stats) => {
         if (err || !stats.isFile()) {
-            const fallbackPath = path.join(ROOT_DIR, 'index.html');
+            const fallbackPath = path.join(PUBLIC_DIR, 'index.html');
             if (fs.existsSync(fallbackPath)) {
                 res.writeHead(200, {
                     'Content-Type': 'text/html; charset=utf-8',

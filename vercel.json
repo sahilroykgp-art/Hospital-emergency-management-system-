@@ -1,7 +1,8 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "buildCommand": "npm run build",
-  "outputDirectory": ".",
+  "framework": null,
+  "buildCommand": "",
+  "outputDirectory": "public",
   "cleanUrls": true,
   "rewrites": [
     { "source": "/ui", "destination": "/index.html" },
