@@ -26,6 +26,8 @@ A complementary responsive browser-based dashboard is provided in [`ui/index.htm
 
 Simply open [`ui/index.html`](ui/index.html) in any modern browser to view the interface.
 
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fsahilroykgp-art%2FHospital-emergency-management-system-)
+
 ---
 
 ## SYSTEM ARCHITECTURE
@@ -180,6 +182,12 @@ npm start
 ```
 The dashboard will be live at:
 👉 **`http://localhost:3000`**
+
+### Option E: Deploy to Vercel (Cloud Hosting)
+1. Go to [vercel.com/new](https://vercel.com/new) and log in with your GitHub account.
+2. Select repository: `Hospital-emergency-management-system-`.
+3. Pre-configured [`vercel.json`](vercel.json) automatically routes to the `ui/` directory.
+4. Click **Deploy** — your live dashboard will be instantly published worldwide with a free HTTPS domain.
 
 ### Running Automated Test & Simulation Suites
 
