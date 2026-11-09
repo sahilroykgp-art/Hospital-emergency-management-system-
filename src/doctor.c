@@ -102,6 +102,7 @@ void doctor_manage_current_patient(DoctorContext *ctx) {
                 char allocated_id[16];
                 if (bed_allocate(ctx->bm, preferred, p, allocated_id, sizeof(allocated_id))) {
                     strncpy(p->assigned_bed_id, allocated_id, sizeof(p->assigned_bed_id) - 1);
+                    p->assigned_bed_id[sizeof(p->assigned_bed_id) - 1] = '\0';
                     p->status = STATUS_ADMITTED_BED;
                     file_log_patient_served(p, "Admitted to Bed", p->doctor_notes, allocated_id);
                     printf("\n" COLOR_GREEN "  [SUCCESS] Patient successfully admitted to Bed %s!\n" COLOR_RESET, allocated_id);
@@ -205,7 +206,9 @@ void doctor_discharge_bed_patient(DoctorContext *ctx) {
 
     char tok[16], name[64];
     strncpy(tok, b->patient_token, sizeof(tok) - 1);
+    tok[sizeof(tok) - 1] = '\0';
     strncpy(name, b->patient_name, sizeof(name) - 1);
+    name[sizeof(name) - 1] = '\0';
 
     if (bed_release(ctx->bm, bed_id)) {
         printf("\n" COLOR_GREEN "  [SUCCESS] Bed %s released. Patient %s (%s) discharged.\n" COLOR_RESET,

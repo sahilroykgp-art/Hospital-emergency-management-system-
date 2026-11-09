@@ -1,0 +1,196 @@
+======================================================================
+[EVENT: PATIENT REGISTRATION & TRIAGE INTAKE]
+Timestamp       : 2026-11-09 19:02:11
+Token           : TK-1001 (Record #1001)
+Arrival Seq     : 1
+Name            : Test Patient Log
+Age / Gender    : 45 / Male
+Contact         : N/A
+Chief Complaint : Severe test complaint
+Triage Level    : Level 1 (Level 1 (CRITICAL / RESUSCITATION))
+Triage Notes    : Routine intake
+Initial Status  : WAITING
+======================================================================
+
+----------------------------------------------------------------------
+[EVENT: CLINICAL ACTION / DEQUEUE]
+Timestamp       : 2026-11-09 19:02:11
+Action Type     : Admitted
+Token           : TK-1001
+Patient Name    : Test Patient Log (Age: 45)
+Triage Severity : Level 1
+Assigned Bed    : ICU-01
+Doctor's Notes  : Doctor notes test
+Updated Status  : WAITING
+----------------------------------------------------------------------
+
+======================================================================
+[EVENT: PATIENT REGISTRATION & TRIAGE INTAKE]
+Timestamp       : 2026-11-09 19:04:45
+Token           : TK-1001 (Record #1001)
+Arrival Seq     : 1
+Name            : Vikram Malhotra
+Age / Gender    : 58 / Male
+Contact         : +91-9811223344
+Chief Complaint : Acute crushing chest pain (suspected STEMI)
+Triage Level    : Level 2 (Level 2 (EMERGENT))
+Triage Notes    : ECG urgently needed; oxygen administered
+Initial Status  : WAITING
+======================================================================
+
+======================================================================
+[EVENT: PATIENT REGISTRATION & TRIAGE INTAKE]
+Timestamp       : 2026-11-09 19:04:45
+Token           : TK-1002 (Record #1002)
+Arrival Seq     : 2
+Name            : Aarav Sharma
+Age / Gender    : 22 / Male
+Contact         : +91-9876543210
+Chief Complaint : Deep forearm laceration with active bleeding
+Triage Level    : Level 4 (Level 4 (LESS URGENT))
+Triage Notes    : Pressure dressing applied; vitals stable
+Initial Status  : WAITING
+======================================================================
+
+======================================================================
+[EVENT: PATIENT REGISTRATION & TRIAGE INTAKE]
+Timestamp       : 2026-11-09 19:04:45
+Token           : TK-1003 (Record #1003)
+Arrival Seq     : 3
+Name            : Rajeshwari Devi
+Age / Gender    : 67 / Female
+Contact         : +91-9455112233
+Chief Complaint : Sudden collapse, unresponsive, suspected cardiac arrest
+Triage Level    : Level 1 (Level 1 (CRITICAL / RESUSCITATION))
+Triage Notes    : Immediate CPR, defibrillator mobilized
+Initial Status  : WAITING
+======================================================================
+
+======================================================================
+[EVENT: PATIENT REGISTRATION & TRIAGE INTAKE]
+Timestamp       : 2026-11-09 19:04:45
+Token           : TK-1004 (Record #1004)
+Arrival Seq     : 4
+Name            : Priya Nambiar
+Age / Gender    : 34 / Female
+Contact         : +91-9988776655
+Chief Complaint : Severe lower abdominal pain (Acute appendicitis)
+Triage Level    : Level 3 (Level 3 (URGENT))
+Triage Notes    : IV line started, ultrasound requested
+Initial Status  : WAITING
+======================================================================
+
+======================================================================
+[EVENT: PATIENT REGISTRATION & TRIAGE INTAKE]
+Timestamp       : 2026-11-09 19:04:45
+Token           : TK-1005 (Record #1005)
+Arrival Seq     : 5
+Name            : Suresh Sen
+Age / Gender    : 45 / Male
+Contact         : +91-9123456780
+Chief Complaint : High-speed motorcycle collision polytrauma
+Triage Level    : Level 1 (Level 1 (CRITICAL / RESUSCITATION))
+Triage Notes    : Airway secured, cervical collar on; immediate trauma bay alert
+Initial Status  : WAITING
+======================================================================
+
+======================================================================
+[EVENT: PATIENT REGISTRATION & TRIAGE INTAKE]
+Timestamp       : 2026-11-09 19:04:45
+Token           : TK-1006 (Record #1006)
+Arrival Seq     : 6
+Name            : Ananya Roy
+Age / Gender    : 19 / Female
+Contact         : +91-9011223344
+Chief Complaint : Mild migraine and inhaler prescription refill
+Triage Level    : Level 5 (Level 5 (NON-URGENT))
+Triage Notes    : Vitals normal, ambulatory
+Initial Status  : WAITING
+======================================================================
+
+----------------------------------------------------------------------
+[EVENT: CLINICAL ACTION / DEQUEUE]
+Timestamp       : 2026-11-09 19:04:45
+Action Type     : Called for Examination / Dequeued
+Token           : TK-1003
+Patient Name    : Rajeshwari Devi (Age: 67)
+Triage Severity : Level 1
+Assigned Bed    : Pending
+Doctor's Notes  : Physician examination commenced
+Updated Status  : UNDER TREATMENT
+----------------------------------------------------------------------
+
+----------------------------------------------------------------------
+[EVENT: CLINICAL ACTION / DEQUEUE]
+Timestamp       : 2026-11-09 19:04:45
+Action Type     : Admitted to Bed
+Token           : TK-1003
+Patient Name    : Rajeshwari Devi (Age: 67)
+Triage Severity : Level 1
+Assigned Bed    : ICU-01
+Doctor's Notes  : Pending examination
+Updated Status  : ADMITTED IN BED
+----------------------------------------------------------------------
+
+----------------------------------------------------------------------
+[EVENT: CLINICAL ACTION / DEQUEUE]
+Timestamp       : 2026-11-09 19:04:45
+Action Type     : Doctor Notes Updated
+Token           : TK-1003
+Patient Name    : Rajeshwari Devi (Age: 67)
+Triage Severity : Level 1
+Assigned Bed    : ICU-01
+Doctor's Notes  : Patient stabilized, vitals monitored
+Updated Status  : ADMITTED IN BED
+----------------------------------------------------------------------
+
+======================================================================
+[EVENT: PATIENT REGISTRATION & TRIAGE INTAKE]
+Timestamp       : 2026-11-09 19:21:14
+Token           : TK-1001 (Record #1001)
+Arrival Seq     : 1
+Name            : Kunal Kapoor
+Age / Gender    : 38 / Male
+Contact         : 9876543210
+Chief Complaint : Severe chest pain
+Triage Level    : Level 2 (Level 2 (EMERGENT))
+Triage Notes    : Triage Level 2 verified
+Initial Status  : WAITING
+======================================================================
+
+----------------------------------------------------------------------
+[EVENT: CLINICAL ACTION / DEQUEUE]
+Timestamp       : 2026-11-09 19:21:14
+Action Type     : Called for Examination / Dequeued
+Token           : TK-1001
+Patient Name    : Kunal Kapoor (Age: 38)
+Triage Severity : Level 2
+Assigned Bed    : Pending
+Doctor's Notes  : Physician examination commenced
+Updated Status  : UNDER TREATMENT
+----------------------------------------------------------------------
+
+----------------------------------------------------------------------
+[EVENT: CLINICAL ACTION / DEQUEUE]
+Timestamp       : 2026-11-09 19:21:14
+Action Type     : Doctor Notes Updated
+Token           : TK-1001
+Patient Name    : Kunal Kapoor (Age: 38)
+Triage Severity : Level 2
+Assigned Bed    : NONE
+Doctor's Notes  : Confirmed angina, administered nitroglycerin
+Updated Status  : UNDER TREATMENT
+----------------------------------------------------------------------
+
+----------------------------------------------------------------------
+[EVENT: CLINICAL ACTION / DEQUEUE]
+Timestamp       : 2026-11-09 19:21:14
+Action Type     : Admitted to Bed
+Token           : TK-1001
+Patient Name    : Kunal Kapoor (Age: 38)
+Triage Severity : Level 2
+Assigned Bed    : ER-01
+Doctor's Notes  : Confirmed angina, administered nitroglycerin
+Updated Status  : ADMITTED IN BED
+----------------------------------------------------------------------
+

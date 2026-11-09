@@ -71,32 +71,32 @@ bool bed_allocate(BedManager *bm, BedType preferred_type, const Patient *p, char
         Bed *b = &bm->beds[i];
         if (b->type == preferred_type && !b->is_occupied) {
             b->is_occupied = true;
-            strncpy(b->patient_token, p->token, sizeof(b->patient_token) - 1);
-            strncpy(b->patient_name, p->name, sizeof(b->patient_name) - 1);
+            snprintf(b->patient_token, sizeof(b->patient_token), "%s", p->token);
+            snprintf(b->patient_name, sizeof(b->patient_name), "%s", p->name);
             b->patient_severity = (int)p->severity;
             get_current_timestamp(b->admission_time, sizeof(b->admission_time));
             if (out_bed_id && out_len > 0) {
-                strncpy(out_bed_id, b->bed_id, out_len - 1);
-                out_bed_id[out_len - 1] = '\0';
+                snprintf(out_bed_id, out_len, "%s", b->bed_id);
             }
             return true;
         }
     }
 
     /* Second pass: if acute ER or observation, can allocate any available general ER bed */
-    for (int i = 0; i < bm->total_beds; i++) {
-        Bed *b = &bm->beds[i];
-        if (!b->is_occupied && b->type != BED_ICU && b->type != BED_TRAUMA) {
-            b->is_occupied = true;
-            strncpy(b->patient_token, p->token, sizeof(b->patient_token) - 1);
-            strncpy(b->patient_name, p->name, sizeof(b->patient_name) - 1);
-            b->patient_severity = (int)p->severity;
-            get_current_timestamp(b->admission_time, sizeof(b->admission_time));
-            if (out_bed_id && out_len > 0) {
-                strncpy(out_bed_id, b->bed_id, out_len - 1);
-                out_bed_id[out_len - 1] = '\0';
+    if (preferred_type == BED_ACUTE_ER || preferred_type == BED_OBSERVATION) {
+        for (int i = 0; i < bm->total_beds; i++) {
+            Bed *b = &bm->beds[i];
+            if (!b->is_occupied && b->type != BED_ICU && b->type != BED_TRAUMA) {
+                b->is_occupied = true;
+                snprintf(b->patient_token, sizeof(b->patient_token), "%s", p->token);
+                snprintf(b->patient_name, sizeof(b->patient_name), "%s", p->name);
+                b->patient_severity = (int)p->severity;
+                get_current_timestamp(b->admission_time, sizeof(b->admission_time));
+                if (out_bed_id && out_len > 0) {
+                    snprintf(out_bed_id, out_len, "%s", b->bed_id);
+                }
+                return true;
             }
-            return true;
         }
     }
 

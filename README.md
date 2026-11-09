@@ -4,7 +4,7 @@
 [![DSA: Priority Queue](https://img.shields.io/badge/DSA-Min--Heap%20Priority%20Queue-brightgreen.svg)]()
 [![Platform: Cross-Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20Linux%20%7C%20macOS-lightgrey.svg)]()
 [![Build: Passing](https://img.shields.io/badge/Build-Passing-success.svg)]()
-[![Tests: 25/25 Passing](https://img.shields.io/badge/Tests-100%25%20Passing-success.svg)]()
+[![Tests: 58/58 Passing](https://img.shields.io/badge/Tests-58%2F58%20Passing%20(100%25)-success.svg)]()
 
 ---
 
@@ -54,6 +54,31 @@ graph TD
     Q --> S[(daily_er_report.txt)]
     Q --> T[System Reset / Daily Purge]
 ```
+
+---
+
+## MODULAR SYSTEM ARCHITECTURE
+
+The codebase is organized cleanly into modular, decoupled components for maximum clarity, maintainability, and ease of demonstration during reviews/viva:
+
+### 1. C Core Modules (`include/`, `src/`)
+| Module | Header & Implementation | Primary Responsibility |
+| :--- | :--- | :--- |
+| **Receptionist Portal** | [`receptionist.h`](include/receptionist.h), [`receptionist.c`](src/receptionist.c) | Patient registration, intake triage, duplicate check, token issuance |
+| **Doctor / Medical Staff** | [`doctor.h`](include/doctor.h), [`doctor.c`](src/doctor.c) | Priority dequeue, examination notes, bed admission & discharge |
+| **Administrator Portal** | [`admin.h`](include/admin.h), [`admin.c`](src/admin.c) | Analytics dashboard, daily report generation, audit purge |
+| **Min-Heap Priority Queue** | [`priority_queue.h`](include/priority_queue.h), [`priority_queue.c`](src/priority_queue.c) | Min-Heap priority ordering (acuity 1..5) & FIFO arrival sequence tie-break |
+| **Emergency Bed Manager** | [`bed_manager.h`](include/bed_manager.h), [`bed_manager.c`](src/bed_manager.c) | 22 specialized beds (ICU, Trauma, Acute ER, Observation), allocation & release |
+| **Triage Protocol Service** | [`triage.h`](include/triage.h), [`triage.c`](src/triage.c) | Keyword heuristics, automated ESI acuity suggestion, clinical guide |
+| **File I/O Persistence** | [`file_io.h`](include/file_io.h), [`file_io.c`](src/file_io.c) | Real-time audit logging (`er_patient_log.txt`) & reports (`daily_er_report.txt`) |
+| **System Main Dispatcher** | [`main.c`](src/main.c) | Interactive CLI menu, live monitor board & demo data loader |
+
+### 2. Web UI Dashboard (`ui/`)
+| Web File | Path | Primary Responsibility |
+| :--- | :--- | :--- |
+| **Clinical ER Dashboard** | [`ui/index.html`](ui/index.html) | Responsive semantic markup for priority queue, examination bay & bed matrix |
+| **Dashboard Stylesheet** | [`ui/style.css`](ui/style.css) | Modern hospital UI design tokens, cards, badges, and responsive grid |
+| **Single-Script Engine** | [`ui/app.js`](ui/app.js) | Self-contained, zero-dependency engine managing Min-Heap DSA, beds & clinical actions |
 
 ---
 
@@ -148,11 +173,25 @@ gcc -Wall -Wextra -std=c11 -Iinclude src/*.c -o hospital_er.exe
 ./hospital_er.exe
 ```
 
-### Running Automated Test Suite (DSA Verification)
+### Option D: Launch Local Web Server (Dashboard)
 ```bash
+npm start
+# or: node server.js
+```
+The dashboard will be live at:
+👉 **`http://localhost:3000`**
+
+### Running Automated Test & Simulation Suites
+
+```bash
+# 1. Full C DSA & System Test Suite (35 Tests)
 gcc -Wall -Wextra -std=c11 -Iinclude src/patient.c src/triage.c src/priority_queue.c src/bed_manager.c src/file_io.c tests/test_priority_queue.c -o test_runner.exe
 ./test_runner.exe
+
+# 2. Web UI Automated Test Suite (23 Tests)
+node tests/test_ui.js
 ```
+
 
 ---
 

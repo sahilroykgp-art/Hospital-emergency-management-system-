@@ -19,6 +19,16 @@ bool receptionist_register_patient(ReceptionistContext *ctx) {
         return false;
     }
 
+    /* Check if patient with identical name is currently waiting in queue */
+    for (int i = 0; i < ctx->pq->size; i++) {
+        if (string_equals_ci(ctx->pq->heap[i].name, p.name)) {
+            printf(COLOR_YELLOW "  [NOTICE] A patient named '%s' is already in the waiting queue (Token: %s).\n" COLOR_RESET,
+                   p.name, ctx->pq->heap[i].token);
+            printf("  Please ensure uniqueness by adding a middle initial or identifier if this is a distinct person.\n");
+            break;
+        }
+    }
+
     p.age = get_input_int("  Enter Patient Age (0 - 130): ", 0, 130);
 
     printf("  Enter Gender (M/F/Other)   : ");
@@ -120,7 +130,7 @@ void receptionist_search_patient(ReceptionistContext *ctx) {
         /* Search by name across queue */
         for (int i = 0; i < ctx->pq->size; i++) {
             if (strstr(ctx->pq->heap[i].name, query) != NULL ||
-                strcasecmp(ctx->pq->heap[i].token, query) == 0) {
+                string_equals_ci(ctx->pq->heap[i].token, query)) {
                 found = ctx->pq->heap[i];
                 in_queue = true;
                 break;
@@ -136,7 +146,7 @@ void receptionist_search_patient(ReceptionistContext *ctx) {
 
     /* Check currently serving patient */
     if (ctx->current_serving_patient &&
-        (strcasecmp(ctx->current_serving_patient->token, query) == 0 ||
+        (string_equals_ci(ctx->current_serving_patient->token, query) ||
          strstr(ctx->current_serving_patient->name, query) != NULL)) {
         printf("\n" COLOR_YELLOW "  [RECORD LOCATED: CURRENTLY UNDER ACTIVE TREATMENT]\n" COLOR_RESET);
         patient_format_card(ctx->current_serving_patient);

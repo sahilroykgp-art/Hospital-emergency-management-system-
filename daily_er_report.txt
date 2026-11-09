@@ -1,0 +1,44 @@
+######################################################################
+#             HOSPITAL EMERGENCY DEPARTMENT - DAILY AUDIT REPORT      #
+######################################################################
+
+Report Generated At : 2026-11-09 19:21:14
+Facility Name       : Central Hospital Emergency & Trauma Care
+Operational Status  : Active (24x7 Emergency Services)
+
+----------------------------------------------------------------------
+1. PATIENT VOLUME SUMMARY
+----------------------------------------------------------------------
+Total Patients Registered Today : 1
+Total Patients Served / Treated : 1
+Patients Currently Waiting/Active: 0
+
+----------------------------------------------------------------------
+2. TRIAGE SEVERITY DISTRIBUTION (ESI SCALE)
+----------------------------------------------------------------------
+Level 1 - Resuscitation (Immediate Life Threat) :   0
+Level 2 - Emergent (High Risk / Minutes Matter) :   1
+Level 3 - Urgent (Complex / Stable Vitals)       :   0
+Level 4 - Less Urgent (Single Resource)          :   0
+Level 5 - Non-Urgent (Routine Evaluation)        :   0
+
+----------------------------------------------------------------------
+3. EMERGENCY BED OCCUPANCY STATUS
+----------------------------------------------------------------------
+Total Capacity       : 22 Beds
+Occupied Beds        : 1 Beds
+Available Beds       : 21 Beds
+Occupancy Percentage : 4.5%
+
+Breakdown by Care Unit:
+  ICU / Resuscitation : 4 Available / 4 Total
+  Trauma Bays         : 4 Available / 4 Total
+  Acute ER Beds       : 7 Available / 8 Total
+  Observation Beds    : 6 Available / 6 Total
+
+Currently Occupied Beds List:
+  Bed [ER-01  ] - Token: TK-1001  | Patient: Kunal Kapoor         | Admitted: 2026-11-09 19:21:14
+
+----------------------------------------------------------------------
+End of Daily Report - End of File
+######################################################################

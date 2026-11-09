@@ -38,13 +38,23 @@ static inline void init_terminal_colors(void) {
 #endif
 }
 
-/* Clear Screen Helper */
+/* Clear Screen Helper via ANSI escape sequence (portable, fast, no subshell) */
 static inline void clear_screen(void) {
-#ifdef _WIN32
-    system("cls");
-#else
-    system("clear");
-#endif
+    printf("\033[2J\033[H");
+    fflush(stdout);
+}
+
+/* Case-insensitive string equality (Pure C11 standard) */
+static inline bool string_equals_ci(const char *s1, const char *s2) {
+    if (!s1 || !s2) return false;
+    while (*s1 && *s2) {
+        if (tolower((unsigned char)*s1) != tolower((unsigned char)*s2)) {
+            return false;
+        }
+        s1++;
+        s2++;
+    }
+    return *s1 == '\0' && *s2 == '\0';
 }
 
 /* Format current time into human-readable string: YYYY-MM-DD HH:MM:SS */
@@ -60,19 +70,21 @@ static inline void get_current_timestamp(char *buffer, size_t size) {
 }
 
 /* Safe string input with newline trimming and stdin cleanup */
-static inline void get_input_string(char *dest, size_t max_len) {
-    if (!dest || max_len == 0) return;
+static inline bool get_input_string(char *dest, size_t max_len) {
+    if (!dest || max_len == 0) return false;
     if (fgets(dest, (int)max_len, stdin) != NULL) {
         size_t len = strlen(dest);
         if (len > 0 && dest[len - 1] == '\n') {
             dest[len - 1] = '\0';
-        } else {
+        } else if (!feof(stdin)) {
             /* flush excess characters in buffer */
             int ch;
             while ((ch = getchar()) != '\n' && ch != EOF);
         }
+        return true;
     } else {
         dest[0] = '\0';
+        return false;
     }
 }
 
@@ -81,10 +93,15 @@ static inline int get_input_int(const char *prompt, int min_val, int max_val) {
     char buffer[64];
     int val = 0;
     while (true) {
+        if (feof(stdin)) {
+            return max_val; /* Return max_val (e.g. Exit) safely on EOF */
+        }
         if (prompt) {
             printf("%s", prompt);
         }
-        get_input_string(buffer, sizeof(buffer));
+        if (!get_input_string(buffer, sizeof(buffer)) && feof(stdin)) {
+            return max_val;
+        }
         if (strlen(buffer) == 0) {
             printf(COLOR_RED "  Invalid input. Please enter a number between %d and %d.\n" COLOR_RESET, min_val, max_val);
             continue;
@@ -100,6 +117,7 @@ static inline int get_input_int(const char *prompt, int min_val, int max_val) {
 
 /* Press Enter to continue prompt */
 static inline void pause_console(void) {
+    if (feof(stdin)) return;
     printf("\n" COLOR_GRAY "Press [Enter] to return to menu..." COLOR_RESET);
     char buf[8];
     get_input_string(buf, sizeof(buf));

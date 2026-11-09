@@ -1,139 +1,180 @@
 #include "common.h"
 #include "patient.h"
-#include "triage.h"
 #include "priority_queue.h"
 #include "bed_manager.h"
 #include "file_io.h"
+#include "triage.h"
 #include "receptionist.h"
 #include "doctor.h"
 #include "admin.h"
 
-/* Preload realistic emergency simulation patients for live demonstration */
-static void load_demo_scenario(PriorityQueue *pq,
-                               int *next_patient_id,
-                               unsigned long *arrival_counter,
-                               int *total_registered,
-                               int *severity_counts) {
-    if (!pq || !next_patient_id || !arrival_counter) return;
+/* Structure for realistic demo patients */
+typedef struct {
+    const char *name;
+    int age;
+    const char *gender;
+    const char *contact;
+    const char *complaint;
+    TriageLevel severity;
+    const char *notes;
+} DemoPatient;
 
-    struct DemoCase {
-        const char *name;
-        int age;
-        const char *gender;
-        const char *contact;
-        const char *complaint;
-        TriageLevel severity;
-        const char *notes;
-    } cases[] = {
-        {
-            .name = "Vikram Malhotra",
-            .age = 58,
-            .gender = "Male",
-            .contact = "+91-9811223344",
-            .complaint = "Acute crushing chest pain radiating to left arm (suspected STEMI)",
-            .severity = TRIAGE_EMERGENT,
-            .notes = "ECG urgently needed; oxygen administered"
-        },
-        {
-            .name = "Aarav Sharma",
-            .age = 22,
-            .gender = "Male",
-            .contact = "+91-9876543210",
-            .complaint = "Deep forearm laceration with active bleeding from glass cut",
-            .severity = TRIAGE_LESS_URGENT,
-            .notes = "Pressure dressing applied; vitals stable"
-        },
-        {
-            .name = "Rajeshwari Devi",
-            .age = 67,
-            .gender = "Female",
-            .contact = "+91-9455112233",
-            .complaint = "Sudden collapse, unresponsive, suspected cardiac arrest / VFib",
-            .severity = TRIAGE_CRITICAL,
-            .notes = "Immediate CPR in progress, defibrillator mobilized"
-        },
-        {
-            .name = "Priya Nambiar",
-            .age = 34,
-            .gender = "Female",
-            .contact = "+91-9988776655",
-            .complaint = "Severe lower right quadrant abdominal pain with fever (Acute appendicitis)",
-            .severity = TRIAGE_URGENT,
-            .notes = "IV line started, ultrasound requested"
-        },
-        {
-            .name = "Suresh Sen",
-            .age = 45,
-            .gender = "Male",
-            .contact = "+91-9123456780",
-            .complaint = "High-speed motorcycle collision, multiple blunt polytrauma",
-            .severity = TRIAGE_CRITICAL,
-            .notes = "Airway secured, cervical collar on; immediate trauma bay alert"
-        },
-        {
-            .name = "Ananya Roy",
-            .age = 19,
-            .gender = "Female",
-            .contact = "+91-9011223344",
-            .complaint = "Mild migraine and requested prescription refill for asthma inhaler",
-            .severity = TRIAGE_NON_URGENT,
-            .notes = "Vitals normal, ambulatory"
-        }
-    };
+/* 6 Realistic Clinical Demo Cases for Instant Simulation */
+static const DemoPatient DEMO_PATIENTS[] = {
+    {
+        .name = "Vikram Malhotra",
+        .age = 58,
+        .gender = "Male",
+        .contact = "+91-9811223344",
+        .complaint = "Acute crushing chest pain (suspected STEMI)",
+        .severity = TRIAGE_EMERGENT,
+        .notes = "ECG urgently needed; oxygen administered"
+    },
+    {
+        .name = "Aarav Sharma",
+        .age = 22,
+        .gender = "Male",
+        .contact = "+91-9876543210",
+        .complaint = "Deep forearm laceration with active bleeding",
+        .severity = TRIAGE_LESS_URGENT,
+        .notes = "Pressure dressing applied; vitals stable"
+    },
+    {
+        .name = "Rajeshwari Devi",
+        .age = 67,
+        .gender = "Female",
+        .contact = "+91-9455112233",
+        .complaint = "Sudden collapse, unresponsive, suspected cardiac arrest",
+        .severity = TRIAGE_CRITICAL,
+        .notes = "Immediate CPR, defibrillator mobilized"
+    },
+    {
+        .name = "Priya Nambiar",
+        .age = 34,
+        .gender = "Female",
+        .contact = "+91-9988776655",
+        .complaint = "Severe lower abdominal pain (Acute appendicitis)",
+        .severity = TRIAGE_URGENT,
+        .notes = "IV line started, ultrasound requested"
+    },
+    {
+        .name = "Suresh Sen",
+        .age = 45,
+        .gender = "Male",
+        .contact = "+91-9123456780",
+        .complaint = "High-speed motorcycle collision polytrauma",
+        .severity = TRIAGE_CRITICAL,
+        .notes = "Airway secured, cervical collar on; immediate trauma bay alert"
+    },
+    {
+        .name = "Ananya Roy",
+        .age = 19,
+        .gender = "Female",
+        .contact = "+91-9011223344",
+        .complaint = "Mild migraine and inhaler prescription refill",
+        .severity = TRIAGE_NON_URGENT,
+        .notes = "Vitals normal, ambulatory"
+    }
+};
 
-    int num_cases = (int)(sizeof(cases) / sizeof(cases[0]));
-    printf("\n" COLOR_CYAN "  [SIMULATION] Injecting %d emergency patients into Priority Queue...\n" COLOR_RESET, num_cases);
+/* Loads demo patients into priority queue to easily demonstrate Min-Heap sorting */
+static void load_demo_patients(PriorityQueue *pq,
+                              int *next_patient_id,
+                              unsigned long *global_arrival_counter,
+                              int *total_registered,
+                              int *severity_counts) {
+    if (!pq || !next_patient_id || !global_arrival_counter) return;
 
-    for (int i = 0; i < num_cases; i++) {
+    printf("\n" COLOR_CYAN COLOR_BOLD "======================================================================\n" COLOR_RESET);
+    printf(COLOR_CYAN COLOR_BOLD "       LOADING 6 REALISTIC EMERGENCY CASES INTO MIN-HEAP QUEUE        \n" COLOR_RESET);
+    printf(COLOR_CYAN COLOR_BOLD "======================================================================\n" COLOR_RESET);
+
+    size_t count = sizeof(DEMO_PATIENTS) / sizeof(DEMO_PATIENTS[0]);
+    for (size_t i = 0; i < count; i++) {
         Patient p;
         patient_init_default(&p);
+
         p.id = (*next_patient_id)++;
-        (*arrival_counter)++;
-        p.arrival_order = *arrival_counter;
+        (*global_arrival_counter)++;
+        p.arrival_order = *global_arrival_counter;
         patient_generate_token(p.id, p.token, sizeof(p.token));
-        strncpy(p.name, cases[i].name, sizeof(p.name) - 1);
-        p.age = cases[i].age;
-        strncpy(p.gender, cases[i].gender, sizeof(p.gender) - 1);
-        strncpy(p.contact, cases[i].contact, sizeof(p.contact) - 1);
-        strncpy(p.chief_complaint, cases[i].complaint, sizeof(p.chief_complaint) - 1);
-        p.severity = cases[i].severity;
-        strncpy(p.triage_notes, cases[i].notes, sizeof(p.triage_notes) - 1);
+        get_current_timestamp(p.arrival_time, sizeof(p.arrival_time));
+
+        strncpy(p.name, DEMO_PATIENTS[i].name, sizeof(p.name) - 1);
+        p.age = DEMO_PATIENTS[i].age;
+        strncpy(p.gender, DEMO_PATIENTS[i].gender, sizeof(p.gender) - 1);
+        strncpy(p.contact, DEMO_PATIENTS[i].contact, sizeof(p.contact) - 1);
+        strncpy(p.chief_complaint, DEMO_PATIENTS[i].complaint, sizeof(p.chief_complaint) - 1);
+        p.severity = DEMO_PATIENTS[i].severity;
+        strncpy(p.triage_notes, DEMO_PATIENTS[i].notes, sizeof(p.triage_notes) - 1);
         p.status = STATUS_WAITING;
 
-        pq_enqueue(pq, &p);
-        file_log_patient_intake(&p);
+        if (pq_enqueue(pq, &p)) {
+            (*total_registered)++;
+            if (severity_counts && p.severity >= 1 && p.severity <= 5) {
+                severity_counts[p.severity]++;
+            }
+            file_log_patient_intake(&p);
 
-        if (total_registered) (*total_registered)++;
-        if (severity_counts && p.severity >= 1 && p.severity <= 5) {
-            severity_counts[p.severity]++;
+            const char *col = triage_level_color(p.severity);
+            printf("  [+] Enqueued %-9s %-20.20s (%s%-12s" COLOR_RESET ") -> %s\n",
+                   p.token, p.name, col, triage_level_to_string(p.severity), p.chief_complaint);
         }
-
-        printf("  + Added: %-8s | %-18s | %s%s" COLOR_RESET "\n",
-               p.token, p.name, triage_level_color(p.severity), triage_level_to_string(p.severity));
     }
 
-    printf(COLOR_GREEN "  [SUCCESS] Demo scenario loaded! Notice how Level 1 patients will jump to front of queue!\n" COLOR_RESET);
+    printf("----------------------------------------------------------------------\n");
+    printf(COLOR_GREEN "  Successfully loaded 6 emergency patients into priority queue!\n" COLOR_RESET);
+    printf("  (Notice: Patients are automatically sorted by Severity 1 -> 5 in Min-Heap)\n");
 }
 
-/* Public Overview Board */
-static void show_public_overview_board(const PriorityQueue *pq, const BedManager *bm, const Patient *curr) {
+/* Displays Live Public Overview Board */
+static void show_live_monitor(const PriorityQueue *pq, const BedManager *bm, const Patient *curr) {
     clear_screen();
-    printf(COLOR_BOLD "========================================================================================================\n" COLOR_RESET);
-    printf(COLOR_BOLD "                 HOSPITAL EMERGENCY DEPARTMENT - LIVE PUBLIC STATUS BOARD                                \n" COLOR_RESET);
-    printf("========================================================================================================\n");
 
+    char now[32];
+    get_current_timestamp(now, sizeof(now));
+
+    int waiting_count = pq ? pq_size(pq) : 0;
+    int occupied_beds = bm ? bed_get_occupied_count(bm) : 0;
+    int total_beds = bm ? bed_get_total_count(bm) : 22;
+
+    printf(COLOR_CYAN COLOR_BOLD "========================================================================================================\n" COLOR_RESET);
+    printf(COLOR_CYAN COLOR_BOLD "             CENTRAL HOSPITAL EMERGENCY DEPARTMENT - LIVE STATUS BOARD                                 \n" COLOR_RESET);
+    printf(COLOR_CYAN COLOR_BOLD "========================================================================================================\n" COLOR_RESET);
+    printf("  System Time: " COLOR_BOLD "%s" COLOR_RESET "  |  Service Status: " COLOR_GREEN "ONLINE (24x7 Emergency Services)" COLOR_RESET "\n", now);
+    printf("  Queue Volume: " COLOR_YELLOW "%d Patients Waiting" COLOR_RESET "  |  Bed Occupancy: " COLOR_GREEN "%d / %d Beds (%.1f%% Occupied)" COLOR_RESET "\n",
+           waiting_count, occupied_beds, total_beds,
+           total_beds > 0 ? ((float)occupied_beds / (float)total_beds) * 100.0f : 0.0f);
+    printf("--------------------------------------------------------------------------------------------------------\n");
+
+    /* Active Examination Bay */
     if (curr && strlen(curr->token) > 0) {
-        printf("  [CURRENTLY UNDER TREATMENT IN EXAMINATION BAY]:\n");
-        printf("  Token: " COLOR_BOLD "%s" COLOR_RESET " | Name: %s | Triage: %s%s" COLOR_RESET " | Status: %s\n",
-               curr->token, curr->name, triage_level_color(curr->severity),
-               triage_level_to_string(curr->severity), patient_status_to_string(curr->status));
+        const char *triage_col = triage_level_color(curr->severity);
+        printf("  " COLOR_BOLD "[ACTIVE RESUSCITATION & CLINICAL EXAMINATION BAY]:" COLOR_RESET "\n");
+        printf("  +--------------------------------------------------------------------------------------------------+\n");
+        printf("  | Token        : " COLOR_BOLD "%-16s" COLOR_RESET " | Name     : %-22s (%d yrs, %-6s) |\n",
+               curr->token, curr->name, curr->age, curr->gender);
+        printf("  | Acuity Level : %s%-20s" COLOR_RESET " | Status   : %-37s |\n",
+               triage_col, triage_level_to_string(curr->severity), patient_status_to_string(curr->status));
+        printf("  | Complaint    : %-81.81s |\n", curr->chief_complaint);
+        printf("  | Assigned Bed : %-16s | Clinical : %-37.37s |\n",
+               strlen(curr->assigned_bed_id) > 0 ? curr->assigned_bed_id : "None (In Bay)",
+               strlen(curr->doctor_notes) > 0 ? curr->doctor_notes : "Under active evaluation");
+        printf("  +--------------------------------------------------------------------------------------------------+\n");
     } else {
-        printf("  [EXAMINATION BAY]: " COLOR_GREEN "Ready for Next Patient" COLOR_RESET "\n");
+        printf("  " COLOR_BOLD "[EXAMINATION BAY]:" COLOR_RESET " " COLOR_GREEN "Currently Vacant & Prepared for Next Priority Patient" COLOR_RESET "\n");
     }
     printf("--------------------------------------------------------------------------------------------------------\n");
 
-    pq_display_table(pq);
-    bed_display_matrix(bm);
+    /* Priority Queue Table */
+    if (pq) {
+        pq_display_table(pq);
+    }
+
+    /* Beds Matrix */
+    if (bm) {
+        bed_display_matrix(bm);
+    }
 }
 
 int main(void) {
@@ -214,12 +255,12 @@ int main(void) {
                 break;
             }
             case 4: {
-                show_public_overview_board(&pq, &bm, &current_serving_patient);
+                show_live_monitor(&pq, &bm, &current_serving_patient);
                 pause_console();
                 break;
             }
             case 5: {
-                load_demo_scenario(&pq, &next_patient_id, &global_arrival_counter, &total_registered, severity_counts);
+                load_demo_patients(&pq, &next_patient_id, &global_arrival_counter, &total_registered, severity_counts);
                 pause_console();
                 break;
             }
@@ -235,7 +276,4 @@ int main(void) {
             }
         }
     }
-
-    pq_free(&pq);
-    return 0;
 }

@@ -4,7 +4,6 @@
 #include "priority_queue.h"
 #include "bed_manager.h"
 #include "file_io.h"
-#include <assert.h>
 
 static int tests_run = 0;
 static int tests_passed = 0;
@@ -19,6 +18,7 @@ static int tests_passed = 0;
     } \
 } while(0)
 
+/* Suite 1: Empty Queue Boundary Conditions */
 static void test_empty_queue(void) {
     printf(COLOR_BOLD "\n--- Test Suite 1: Empty Queue Boundary Conditions ---\n" COLOR_RESET);
     PriorityQueue pq;
@@ -34,12 +34,12 @@ static void test_empty_queue(void) {
     pq_free(&pq);
 }
 
+/* Suite 2: Triage Severity Priority Ordering */
 static void test_min_heap_priority_ordering(void) {
     printf(COLOR_BOLD "\n--- Test Suite 2: Triage Severity Priority Ordering ---\n" COLOR_RESET);
     PriorityQueue pq;
     pq_init(&pq, 10);
 
-    /* Enqueue in reverse priority order: Level 5, then Level 3, then Level 1 */
     Patient p5, p3, p1;
     patient_init_default(&p5);
     p5.id = 1;
@@ -65,7 +65,6 @@ static void test_min_heap_priority_ordering(void) {
 
     TEST_ASSERT(pq_size(&pq) == 3, "Queue holds 3 patients");
 
-    /* Dequeue should return Level 1 first, then Level 3, then Level 5 */
     Patient out1, out2, out3;
     TEST_ASSERT(pq_dequeue(&pq, &out1) == true, "First dequeue succeeds");
     TEST_ASSERT(out1.severity == TRIAGE_CRITICAL && strcmp(out1.token, "TK-0003") == 0,
@@ -84,12 +83,12 @@ static void test_min_heap_priority_ordering(void) {
     pq_free(&pq);
 }
 
+/* Suite 3: FIFO Arrival Tie-Breaking */
 static void test_fifo_tie_breaking(void) {
     printf(COLOR_BOLD "\n--- Test Suite 3: FIFO Arrival Tie-Breaking for Equal Severity ---\n" COLOR_RESET);
     PriorityQueue pq;
     pq_init(&pq, 10);
 
-    /* Three patients all having Severity Level 2 (Emergent), but arriving at sequence 10, 11, 12 */
     Patient a, b, c;
     patient_init_default(&a);
     a.id = 10;
@@ -109,12 +108,10 @@ static void test_fifo_tie_breaking(void) {
     c.severity = TRIAGE_EMERGENT;
     c.arrival_order = 12;
 
-    /* Enqueue in order: b, then c, then a */
     pq_enqueue(&pq, &b);
     pq_enqueue(&pq, &c);
     pq_enqueue(&pq, &a);
 
-    /* Dequeue order must be: a (seq 10), then b (seq 11), then c (seq 12) */
     Patient out;
     pq_dequeue(&pq, &out);
     TEST_ASSERT(out.arrival_order == 10 && strcmp(out.token, "TK-0010") == 0,
@@ -131,6 +128,7 @@ static void test_fifo_tie_breaking(void) {
     pq_free(&pq);
 }
 
+/* Suite 4: Clinical Deterioration & Heap Promotion */
 static void test_retriage_elevation(void) {
     printf(COLOR_BOLD "\n--- Test Suite 4: Clinical Deterioration & Heap Re-balancing ---\n" COLOR_RESET);
     PriorityQueue pq;
@@ -150,11 +148,9 @@ static void test_retriage_elevation(void) {
     pq_enqueue(&pq, &p_stable);
     pq_enqueue(&pq, &p_critical);
 
-    /* Patient 2001 suddenly deteriorates to Level 1 (Cardiac arrest) */
     bool updated = pq_update_severity(&pq, "TK-2001", TRIAGE_CRITICAL, "Sudden collapse");
     TEST_ASSERT(updated == true, "Severity update function returns true");
 
-    /* Now TK-2001 should be at the front of queue despite previously being Level 4! */
     Patient top;
     pq_peek(&pq, &top);
     TEST_ASSERT(strcmp(top.token, "TK-2001") == 0 && top.severity == TRIAGE_CRITICAL,
@@ -163,6 +159,7 @@ static void test_retriage_elevation(void) {
     pq_free(&pq);
 }
 
+/* Suite 5: Bed Allocation Lifecycle */
 static void test_bed_manager(void) {
     printf(COLOR_BOLD "\n--- Test Suite 5: Emergency Bed Allocation Lifecycle ---\n" COLOR_RESET);
     BedManager bm;
@@ -183,30 +180,84 @@ static void test_bed_manager(void) {
     TEST_ASSERT(strcmp(bed_id, "ICU-01") == 0, "Allocated bed is ICU-01");
     TEST_ASSERT(bed_get_occupied_count(&bm) == 1, "Occupied count is 1");
 
-    /* Release bed */
     bool rel = bed_release(&bm, "ICU-01");
     TEST_ASSERT(rel == true, "ICU-01 released successfully");
     TEST_ASSERT(bed_get_occupied_count(&bm) == 0, "Occupied count is 0 after release");
-
-    /* Second release should fail */
     TEST_ASSERT(bed_release(&bm, "ICU-01") == false, "Releasing already vacant bed returns false");
+}
+
+/* Suite 6: Dynamic Heap Scaling & Stress Test (150 Patients) */
+static void test_high_volume_stress(void) {
+    printf(COLOR_BOLD "\n--- Test Suite 6: Dynamic Capacity Scaling (150 Patients) ---\n" COLOR_RESET);
+    PriorityQueue pq;
+    pq_init(&pq, 8);
+
+    const int total = 150;
+    bool all_ok = true;
+    for (int i = 0; i < total; i++) {
+        Patient p;
+        patient_init_default(&p);
+        p.id = 5000 + i;
+        snprintf(p.token, sizeof(p.token), "TK-%04d", p.id);
+        p.severity = (TriageLevel)(5 - (i % 5));
+        p.arrival_order = (unsigned long)(i + 1);
+        if (!pq_enqueue(&pq, &p)) {
+            all_ok = false;
+            break;
+        }
+    }
+    TEST_ASSERT(all_ok == true, "All 150 patients enqueued (dynamic realloc verified)");
+    TEST_ASSERT(pq_size(&pq) == total, "Queue holds exactly 150 patients");
+
+    bool invariant = true;
+    Patient prev;
+    pq_dequeue(&pq, &prev);
+    for (int i = 1; i < total; i++) {
+        Patient curr;
+        pq_dequeue(&pq, &curr);
+        if (curr.severity < prev.severity) {
+            invariant = false;
+            break;
+        }
+        if (curr.severity == prev.severity && curr.arrival_order < prev.arrival_order) {
+            invariant = false;
+            break;
+        }
+        prev = curr;
+    }
+    TEST_ASSERT(invariant == true, "Strict Min-Heap invariant satisfied across 150 dequeues");
+    TEST_ASSERT(pq_is_empty(&pq) == true, "Queue completely empty after stress dequeue");
+    pq_free(&pq);
+}
+
+/* Suite 7: Triage Keyword Heuristic Engine */
+static void test_triage_heuristics(void) {
+    printf(COLOR_BOLD "\n--- Test Suite 7: Clinical Triage Keyword Heuristics ---\n" COLOR_RESET);
+    TEST_ASSERT(triage_suggest_level("Sudden cardiac arrest on street") == TRIAGE_CRITICAL, "Keyword 'cardiac arrest' -> Level 1");
+    TEST_ASSERT(triage_suggest_level("Crushing chest pain radiating to arm") == TRIAGE_EMERGENT, "Keyword 'chest pain' -> Level 2");
+    TEST_ASSERT(triage_suggest_level("Severe lower right abdominal pain") == TRIAGE_URGENT, "Keyword 'abdominal pain' -> Level 3");
+    TEST_ASSERT(triage_suggest_level("Ankle sprain while playing basketball") == TRIAGE_LESS_URGENT, "Keyword 'sprain' -> Level 4");
+    TEST_ASSERT(triage_suggest_level("Routine prescription refill") == TRIAGE_NON_URGENT, "Unmatched complaint -> Level 5");
+    TEST_ASSERT(triage_suggest_level(NULL) == TRIAGE_NON_URGENT, "NULL complaint handled safely -> Level 5");
 }
 
 int main(void) {
     init_terminal_colors();
-    printf(COLOR_BOLD "========================================================\n" COLOR_RESET);
-    printf(COLOR_BOLD " HOSPITAL EMERGENCY MANAGEMENT SYSTEM - DSA TEST SUITE  \n" COLOR_RESET);
-    printf(COLOR_BOLD "========================================================\n" COLOR_RESET);
+    printf(COLOR_CYAN COLOR_BOLD "========================================================\n" COLOR_RESET);
+    printf(COLOR_CYAN COLOR_BOLD " HOSPITAL EMERGENCY MANAGEMENT SYSTEM - FULL TEST SUITE \n" COLOR_RESET);
+    printf(COLOR_CYAN COLOR_BOLD "========================================================\n" COLOR_RESET);
 
     test_empty_queue();
     test_min_heap_priority_ordering();
     test_fifo_tie_breaking();
     test_retriage_elevation();
     test_bed_manager();
+    test_high_volume_stress();
+    test_triage_heuristics();
 
     printf("\n" COLOR_BOLD "========================================================\n" COLOR_RESET);
     printf(" Results: %d / %d Tests Passed (%.1f%%)\n",
-           tests_passed, tests_run, ((double)tests_passed / tests_run) * 100.0);
+           tests_passed, tests_run, ((double)tests_passed / (double)tests_run) * 100.0);
     printf("========================================================\n" COLOR_RESET);
 
     return (tests_passed == tests_run) ? 0 : 1;

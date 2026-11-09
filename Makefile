@@ -1,6 +1,6 @@
 CC = gcc
 CFLAGS = -Wall -Wextra -std=c11 -Iinclude -O2
-SRCS = $(wildcard src/*.c)
+SRCS = src/admin.c src/bed_manager.c src/doctor.c src/file_io.c src/main.c src/patient.c src/priority_queue.c src/receptionist.c src/triage.c
 OBJS = $(SRCS:.c=.o)
 TARGET = hospital_er.exe
 
@@ -13,9 +13,10 @@ src/%.o: src/%.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
-	rm -f src/*.o $(TARGET) test_runner.exe
+	rm -f src/*.o $(TARGET) test_runner.exe bin/*.exe
 
 test:
+	@if not exist bin mkdir bin
 	$(CC) $(CFLAGS) -Iinclude src/patient.c src/triage.c src/priority_queue.c src/bed_manager.c src/file_io.c tests/test_priority_queue.c -o test_runner.exe
 	./test_runner.exe
 
