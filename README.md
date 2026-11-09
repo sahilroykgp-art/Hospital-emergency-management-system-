@@ -178,7 +178,7 @@ gcc -Wall -Wextra -std=c11 -Iinclude src/*.c -o hospital_er.exe
 ### Option D: Launch Local Web Server (Dashboard)
 ```bash
 npm start
-# or: node server.js
+# or: node scripts/server.js
 ```
 The dashboard will be live at:
 👉 **`http://localhost:3000`**

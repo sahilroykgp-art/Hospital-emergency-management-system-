@@ -1,5 +1,5 @@
 // ============================================================================
-// Hospital Emergency Management System - Web Server & Serverless Handler
+// Hospital Emergency Management System - Local Web Server
 // Serves the Web Dashboard with zero external dependencies.
 // ============================================================================
 
@@ -8,8 +8,8 @@ const fs = require('fs');
 const path = require('path');
 
 const PORT = process.env.PORT || 3000;
-const ROOT_DIR = __dirname;
-const UI_DIR = path.join(__dirname, 'ui');
+const ROOT_DIR = path.resolve(__dirname, '..');
+const UI_DIR = path.join(ROOT_DIR, 'ui');
 
 const MIME_TYPES = {
     '.html': 'text/html; charset=utf-8',
@@ -47,7 +47,6 @@ const requestHandler = (req, res) => {
 
     fs.stat(resolvedPath, (err, stats) => {
         if (err || !stats.isFile()) {
-            // Fallback to index.html
             const fallbackPath = path.join(ROOT_DIR, 'index.html');
             if (fs.existsSync(fallbackPath)) {
                 res.writeHead(200, {
@@ -75,19 +74,15 @@ const requestHandler = (req, res) => {
     });
 };
 
-// Start local HTTP server if executed directly
-if (require.main === module) {
-    const server = http.createServer(requestHandler);
-    server.listen(PORT, '127.0.0.1', () => {
-        console.log('======================================================================');
-        console.log('    HOSPITAL EMERGENCY MANAGEMENT SYSTEM - LOCAL WEB SERVER           ');
-        console.log('======================================================================');
-        console.log(`  Local URL : http://localhost:${PORT}`);
-        console.log(`  IP URL    : http://127.0.0.1:${PORT}`);
-        console.log('======================================================================');
-        console.log('Press Ctrl+C to stop the server.');
-    });
-}
+const server = http.createServer(requestHandler);
+server.listen(PORT, '127.0.0.1', () => {
+    console.log('======================================================================');
+    console.log('    HOSPITAL EMERGENCY MANAGEMENT SYSTEM - LOCAL WEB SERVER           ');
+    console.log('======================================================================');
+    console.log(`  Local URL : http://localhost:${PORT}`);
+    console.log(`  IP URL    : http://127.0.0.1:${PORT}`);
+    console.log('======================================================================');
+    console.log('Press Ctrl+C to stop the server.');
+});
 
-// Export for serverless environments (e.g. Vercel)
-module.exports = requestHandler;
+module.exports = server;
