@@ -13,7 +13,7 @@ test_runner.exe
 .DS_Store
 Thumbs.db
 
-# IDE and editor files
-.vscode/
-.idea/
-*.swp
+# Node modules
+node_modules/
+package-lock.json
+.vercel/
